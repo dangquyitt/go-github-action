@@ -29,4 +29,4 @@ jobs:
       - name: Delete old container
         run: sudo docker rm -f go-github-action-container
       - name: Run docker container
-        run: sudo docker container run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} go-github-action-container dangquyitt/go-github-action:latest
+        run: sudo docker container run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} --name go-github-action-container dangquyitt/go-github-action:latest
