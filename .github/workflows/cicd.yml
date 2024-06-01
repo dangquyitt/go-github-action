@@ -1,0 +1,32 @@
+name: Deploy Go Application
+
+on:
+  push:
+    branchs:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Create .env file
+        run: echo "PORT=${{ secrets.PORT }}" >> .env
+      - name: Login to Dockerhub
+        run: docker-logiu -u ${{ secets.DOCKER_USERNAME }} -p ${{ secets.DOCKER_PASSWORD}}
+      - name: Build docker image
+        run: docker build -t dangquyitt/go-github-action .
+      - name: Push image to docker hub
+        run: docker push dangquyitt/go-github-action:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull docker image
+        run: docker pull dangquyitt/go-github-action:latest
+      - name: Delete old container
+        run: docker rm -f go-github-action-container
+      - name: Run docker container
+        run: docker container run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} go-github-action-container dangquyitt/go-github-action
